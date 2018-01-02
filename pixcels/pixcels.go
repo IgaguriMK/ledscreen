@@ -27,8 +27,8 @@ func (p Pixcel) RGBA() (uint32, uint32, uint32, uint32) {
 }
 
 type PixcelArray struct {
-	XSize   int
-	YSize   int
+	Width   int
+	Height  int
 	Pixcels [][]Pixcel
 }
 
@@ -45,28 +45,28 @@ func Load(fileName string) (*PixcelArray, error) {
 	}
 
 	bounds := img.Bounds()
-	xSize := bounds.Dx()
-	ySize := bounds.Dy()
-	pa := NewPixcelArray(xSize, ySize)
+	width := bounds.Dx()
+	height := bounds.Dy()
+	pa := NewPixcelArray(width, height)
 
-	for y := 0; y < ySize; y++ {
-		for x := 0; x < xSize; x++ {
+	for x := 0; x < width; x++ {
+		for y := 0; y < height; y++ {
 			r, g, b, a := img.At(x, y).RGBA()
-			pa.Pixcels[y][x] = Pixcel{r, g, b, a}
+			pa.Pixcels[x][y] = Pixcel{r, g, b, a}
 		}
 	}
 
 	return pa, nil
 }
 
-func NewPixcelArray(xSize, ySize int) *PixcelArray {
-	pixcels := make([][]Pixcel, ySize)
-	for y := 0; y < ySize; y++ {
-		pixcels[y] = make([]Pixcel, xSize)
+func NewPixcelArray(width, height int) *PixcelArray {
+	pixcels := make([][]Pixcel, width)
+	for x := 0; x < width; x++ {
+		pixcels[x] = make([]Pixcel, height)
 	}
 	return &PixcelArray{
-		XSize:   xSize,
-		YSize:   ySize,
+		Width:   width,
+		Height:  height,
 		Pixcels: pixcels,
 	}
 }
@@ -85,12 +85,12 @@ func loadImage(fileName string, file io.Reader) (image.Image, error) {
 }
 
 func (pa *PixcelArray) SaveTo(fileName string) error {
-	rect := image.Rect(0, 0, pa.XSize, pa.YSize)
+	rect := image.Rect(0, 0, pa.Width, pa.Height)
 	img := image.NewRGBA(rect)
 
-	for y := 0; y < pa.YSize; y++ {
-		for x := 0; x < pa.XSize; x++ {
-			img.Set(x, y, pa.Pixcels[y][x])
+	for x := 0; x < pa.Width; x++ {
+		for y := 0; y < pa.Height; y++ {
+			img.Set(x, y, pa.Pixcels[x][y])
 		}
 	}
 
@@ -117,45 +117,45 @@ func (pa *PixcelArray) SaveTo(fileName string) error {
 }
 
 func (pa *PixcelArray) JoinHorizontal(right *PixcelArray) {
-	if pa.YSize != right.YSize {
-		panic("Mismatch PixcelArray YSize")
+	if pa.Height != right.Height {
+		panic("Mismatch PixcelArray Height")
 	}
 
-	pa.XSize = pa.XSize + right.XSize
+	pa.Width = pa.Width + right.Width
 
-	for y := 0; y < pa.YSize; y++ {
-		line := make([]Pixcel, 0, pa.XSize)
-		line = append(line, pa.Pixcels[y]...)
-		line = append(line, right.Pixcels[y]...)
-		pa.Pixcels[y] = line
-	}
-}
-
-func (pa *PixcelArray) JoinVertical(bottom *PixcelArray) {
-	if pa.XSize != bottom.XSize {
-		panic("Mismatch PixcelArray XSize")
-	}
-
-	pa.YSize = pa.YSize + bottom.YSize
-
-	pixcels := make([][]Pixcel, 0, pa.YSize)
+	pixcels := make([][]Pixcel, 0, pa.Width)
 	pixcels = append(pixcels, pa.Pixcels...)
-	pixcels = append(pixcels, bottom.Pixcels...)
+	pixcels = append(pixcels, right.Pixcels...)
 	pa.Pixcels = pixcels
 }
 
+func (pa *PixcelArray) JoinVertical(bottom *PixcelArray) {
+	if pa.Width != bottom.Width {
+		panic("Mismatch PixcelArray Width")
+	}
+
+	pa.Height = pa.Height + bottom.Height
+
+	for x := 0; x < pa.Width; x++ {
+		line := make([]Pixcel, 0, pa.Width)
+		line = append(line, pa.Pixcels[x]...)
+		line = append(line, bottom.Pixcels[x]...)
+		pa.Pixcels[x] = line
+	}
+}
+
 func (pa *PixcelArray) MultColor(p Pixcel) *PixcelArray {
-	npa := NewPixcelArray(pa.XSize, pa.YSize)
+	npa := NewPixcelArray(pa.Width, pa.Height)
 
 	mul32 := func(x, y uint32) uint32 {
 		return uint32((uint64(x) * uint64(y)) >> 16)
 	}
 
-	for y := 0; y < pa.YSize; y++ {
-		for x := 0; x < pa.XSize; x++ {
-			px := pa.Pixcels[y][x]
+	for x := 0; x < pa.Width; x++ {
+		for y := 0; y < pa.Height; y++ {
+			px := pa.Pixcels[x][y]
 
-			npa.Pixcels[y][x] = Pixcel{
+			npa.Pixcels[x][y] = Pixcel{
 				R: mul32(px.R, p.R),
 				G: mul32(px.G, p.G),
 				B: mul32(px.B, p.B),
@@ -168,16 +168,16 @@ func (pa *PixcelArray) MultColor(p Pixcel) *PixcelArray {
 }
 
 func (pa *PixcelArray) BackColor(p Pixcel) *PixcelArray {
-	npa := NewPixcelArray(pa.XSize, pa.YSize)
+	npa := NewPixcelArray(pa.Width, pa.Height)
 
-	for y := 0; y < pa.YSize; y++ {
-		for x := 0; x < pa.XSize; x++ {
-			px := pa.Pixcels[y][x]
+	for x := 0; x < pa.Width; x++ {
+		for y := 0; y < pa.Height; y++ {
+			px := pa.Pixcels[x][y]
 			if px.A == 0 {
-				npa.Pixcels[y][x] = p
+				npa.Pixcels[x][y] = p
 			} else {
 				px.A = PixcelMax
-				npa.Pixcels[y][x] = px
+				npa.Pixcels[x][y] = px
 			}
 		}
 	}
@@ -186,15 +186,15 @@ func (pa *PixcelArray) BackColor(p Pixcel) *PixcelArray {
 }
 
 func (pa *PixcelArray) DotImage(dot *PixcelArray) *PixcelArray {
-	npa := NewPixcelArray(pa.XSize*dot.XSize, 0)
+	npa := NewPixcelArray(0, pa.Height*dot.Height)
 
-	for y := 0; y < pa.YSize; y++ {
-		line := NewPixcelArray(0, dot.YSize)
-		for x := 0; x < pa.XSize; x++ {
-			d := dot.MultColor(pa.Pixcels[y][x])
-			line.JoinHorizontal(d)
+	for x := 0; x < pa.Width; x++ {
+		line := NewPixcelArray(dot.Height, 0)
+		for y := 0; y < pa.Height; y++ {
+			d := dot.MultColor(pa.Pixcels[x][y])
+			line.JoinVertical(d)
 		}
-		npa.JoinVertical(line)
+		npa.JoinHorizontal(line)
 	}
 
 	return npa

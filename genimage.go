@@ -80,7 +80,7 @@ func NewPrinter(dot *pixcels.PixcelArray, def pixcels.Pixcel) *Printer {
 		Background: Black,
 		Fill:       def,
 		Dot:        dot,
-		Image:      pixcels.NewPixcelArray(0, 16*dot.YSize),
+		Image:      pixcels.NewPixcelArray(0, 16*dot.Height),
 	}
 }
 
