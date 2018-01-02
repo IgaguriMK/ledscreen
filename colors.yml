@@ -1,0 +1,7 @@
+default: "o"
+colors:
+    - {name: "r", value: [1.0, 0.0, 0.0]}
+    - {name: "o", value: [1.0, 0.5, 0.0]}
+    - {name: "g", value: [0.0, 1.0, 0.0]}
+    - {name: "k", value: [0.0, 0.0, 0.0]}
+    - {name: "w", value: [1.0, 1.0, 1.0]}

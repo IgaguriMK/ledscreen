@@ -1,0 +1,11 @@
+*.exe
+viewchar
+runeid
+genimage
+
+*.jpeg
+*.jpg
+*.png
+
+!image/*.png
+!image/**/*.png
