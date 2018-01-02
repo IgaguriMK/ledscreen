@@ -17,7 +17,7 @@ func main() {
 	var dotFile string
 	flag.StringVar(&dotFile, "d", "image/dot.png", "Dot image file")
 	var outFile string
-	flag.StringVar(&outFile, "o", "image", "Output name")
+	flag.StringVar(&outFile, "o", "output", "Output name")
 	var colorFile string
 	flag.StringVar(&colorFile, "c", "colors.yml", "Colormap file")
 	var width int
