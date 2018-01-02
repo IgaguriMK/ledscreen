@@ -1,9 +1,7 @@
 package runes
 
 import (
-	"encoding/hex"
 	"fmt"
-	"strings"
 )
 
 func ImageName(r rune) string {
@@ -16,6 +14,5 @@ func GetFirstRune(str string) rune {
 }
 
 func RuneCode(r rune) string {
-	bytes := []byte(string(r))
-	return strings.ToUpper(hex.EncodeToString(bytes))
+	return fmt.Sprintf("%X", r)
 }
