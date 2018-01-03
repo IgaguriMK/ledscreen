@@ -11,8 +11,6 @@ import (
 	"github.com/IgaguriMK/ledscreen/runes"
 )
 
-var Black pixcels.Pixcel = pixcels.Pixcel{0, 0, 0, pixcels.PixcelMax}
-
 func main() {
 	var dotFile string
 	flag.StringVar(&dotFile, "d", "image/dot.png", "Dot image file")
@@ -38,10 +36,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	printer := NewPrinter(dot, colors["-"])
+	printer := NewPrinter()
+	printer.Fill = colors[":"]
+	printer.Background = colors["_"]
 
 	for _, arg := range args {
 		switch {
+		case arg == ":":
+			printer.Background = colors[":"]
 		case strings.HasPrefix(arg, ":"):
 			cn := strings.TrimPrefix(arg, ":")
 			col, ok := colors[cn]
@@ -50,8 +52,8 @@ func main() {
 				os.Exit(1)
 			}
 			printer.Fill = col
-		case arg == "_-":
-			printer.Background = Black
+		case arg == "_":
+			printer.Background = colors["_"]
 		case strings.HasPrefix(arg, "_"):
 			cn := strings.TrimPrefix(arg, "_")
 			col, ok := colors[cn]
@@ -65,22 +67,19 @@ func main() {
 		}
 	}
 
-	printer.Image.SaveTo(outFile + ".png")
+	result := printer.Image.DotImage(dot)
+	result.SaveTo(outFile + ".png")
 }
 
 type Printer struct {
 	Background pixcels.Pixcel
 	Fill       pixcels.Pixcel
-	Dot        *pixcels.PixcelArray
 	Image      *pixcels.PixcelArray
 }
 
-func NewPrinter(dot *pixcels.PixcelArray, def pixcels.Pixcel) *Printer {
+func NewPrinter() *Printer {
 	return &Printer{
-		Background: Black,
-		Fill:       def,
-		Dot:        dot,
-		Image:      pixcels.NewPixcelArray(0, 16*dot.Height),
+		Image: pixcels.NewPixcelArray(0, 16),
 	}
 }
 
@@ -95,9 +94,7 @@ func (pr *Printer) Print(str string) {
 
 		runeImg = runeImg.MultColor(pr.Fill)
 		runeImg = runeImg.BackColor(pr.Background)
-
-		charImg := runeImg.DotImage(pr.Dot)
-		pr.Image.JoinHorizontal(charImg)
+		pr.Image.JoinHorizontal(runeImg)
 
 		fmt.Printf("'%v' %s\n", string(r), runes.RuneCode(r))
 	}

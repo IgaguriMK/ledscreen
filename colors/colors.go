@@ -11,6 +11,7 @@ import (
 
 type ColorSetting struct {
 	Default string `yaml:"default"`
+	Back    string `yaml:"back"`
 	Colors  []struct {
 		Name  string    `yaml:"name"`
 		Value []float32 `yaml:"value"`
@@ -37,10 +38,17 @@ func LoadTable(fileName string) (map[string]pixcels.Pixcel, error) {
 
 	d, ok := colorMap[colorSetting.Default]
 	if !ok {
-		return nil, errors.New("Cannot find default color '" + colorSetting.Default + "'")
+		return nil, errors.New("Cannot find default fill color '" + colorSetting.Default + "'")
 	}
 
-	colorMap["-"] = d
+	colorMap[":"] = d
+
+	b, ok := colorMap[colorSetting.Back]
+	if !ok {
+		return nil, errors.New("Cannot find default background color '" + colorSetting.Back + "'")
+	}
+
+	colorMap["_"] = b
 
 	return colorMap, nil
 }
