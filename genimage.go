@@ -19,7 +19,7 @@ func main() {
 	var colorFile string
 	flag.StringVar(&colorFile, "c", "colors.yml", "Colormap file")
 	var width int
-	flag.IntVar(&width, "w", 256, "Image maximum width in dot. 0 is no scroll")
+	flag.IntVar(&width, "w", 240, "Image maximum width in dot. 0 is no scroll")
 
 	flag.Parse()
 	args := flag.Args()
