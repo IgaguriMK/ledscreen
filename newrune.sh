@@ -4,6 +4,8 @@ FONT=./fonts/00-jp.otf
 
 set -eu
 
+source loadconf.sh
+
 if [ $# -lt 1 ]; then
 	echo "No arg"
 	exit 1
@@ -11,15 +13,10 @@ fi
 
 if [ $# -eq 1 ]; then
 	CHAR=$1
-elif [ $# -eq 2 ]; then
-	EDITOR=$1
-	CHAR=$2
 else
-	EDITOR=$1
-	CHAR=$3
-	FONT=$2
+	CHAR=$2
+	FONT=$1
 fi
-
 
 
 FILE=`./runeid "$CHAR"`
@@ -37,6 +34,4 @@ fi
 
 convert -size ${SIZE}x16 -font $FONT -gravity Center -fill white -background black -pointsize 18 "label:$CHAR" $FILE
 
-if [ -v EDITOR ]; then
-	$EDITOR $FILE
-fi
+$EDITOR $FILE

@@ -7,6 +7,6 @@ if [ $# -lt 2 ]; then
 	exit 1
 fi
 
-FROM=`./runeid $1`
-TO=`./runeid $2`
+FROM=`./runeid "$1"`
+TO=`./runeid "$2"`
 cp $FROM $TO

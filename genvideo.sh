@@ -1,8 +1,14 @@
 #! /bin/bash
 
-if [ $# -lt 2 ]; then
-	echo "Few args"
-	exit 1
+PIC=output/
+MOV=output
+
+if [ $# -ge 1 ]; then
+	PIC=$1
 fi
 
-ffmpeg -r 30 -i "${1}%06d.png" -vcodec libx264 -pix_fmt yuv420p ${2}.mp4
+if [ $# -ge 2 ]; then
+	MOV=$2
+fi
+
+ffmpeg -r 30 -i "${PIC}%06d.png" -vcodec libx264 -pix_fmt yuv420p ${MOV}.mp4
