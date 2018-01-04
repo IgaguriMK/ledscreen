@@ -1,7 +1,9 @@
 #! /bin/bash
 
-if [ "$FONT" == "" ]; then
-	FONT=Noto-Sans-Mono-CJK-JP-Regular
+set -eu
+
+if [ ! -v FONT ]; then
+	FONT=Noto-Sans-Mono-Regular
 fi
 
 if [ $# -lt 1 ]; then
@@ -23,8 +25,14 @@ if [ -e $FILE ]; then
 	exit 1
 fi
 
-convert -size 16x16 -font $FONT -gravity Center -fill white -background black -pointsize 18 "label:$CHAR" $FILE
+if ./runewidth "$CHAR"; then
+	SIZE=12
+else
+	SIZE=16
+fi
 
-if [ "$EDITOR" != "" ]; then
+convert -size ${SIZE}x16 -font $FONT -gravity Center -fill white -background black -pointsize 18 "label:$CHAR" $FILE
+
+if [ -v EDITOR ]; then
 	$EDITOR $FILE
 fi
