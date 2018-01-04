@@ -26,6 +26,17 @@ func (p Pixcel) RGBA() (uint32, uint32, uint32, uint32) {
 	return p.R, p.G, p.B, p.A
 }
 
+func FromArray(v []float32) Pixcel {
+	v = append(v, 1.0, 1.0, 1.0, 1.0)
+
+	return Pixcel{
+		R: uint32(v[0] * PixcelMax),
+		G: uint32(v[1] * PixcelMax),
+		B: uint32(v[2] * PixcelMax),
+		A: uint32(v[3] * PixcelMax),
+	}
+}
+
 type PixcelArray struct {
 	Width   int
 	Height  int
@@ -198,15 +209,4 @@ func (pa *PixcelArray) DotImage(dot *PixcelArray) *PixcelArray {
 	}
 
 	return npa
-}
-
-func FromArray(v []float32) Pixcel {
-	v = append(v, 1.0, 1.0, 1.0, 1.0)
-
-	return Pixcel{
-		R: uint32(v[0] * PixcelMax),
-		G: uint32(v[1] * PixcelMax),
-		B: uint32(v[2] * PixcelMax),
-		A: uint32(v[3] * PixcelMax),
-	}
 }
