@@ -1,10 +1,8 @@
 #! /bin/bash
 
-set -eu
+FONT=./fonts/00-jp.otf
 
-if [ ! -v FONT ]; then
-	FONT=Noto-Sans-Mono-Regular
-fi
+set -eu
 
 if [ $# -lt 1 ]; then
 	echo "No arg"
@@ -13,10 +11,16 @@ fi
 
 if [ $# -eq 1 ]; then
 	CHAR=$1
-else
+elif [ $# -eq 2 ]; then
 	EDITOR=$1
 	CHAR=$2
+else
+	EDITOR=$1
+	CHAR=$3
+	FONT=$2
 fi
+
+
 
 FILE=`./runeid "$CHAR"`
 
