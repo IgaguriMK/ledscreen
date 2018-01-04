@@ -104,7 +104,7 @@ func (pr *Printer) Print(str string) {
 		imageName := runes.ImageName(r)
 		runeImg, err := pixcels.Load(imageName)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Rune '%v' not found", r)
+			fmt.Fprintf(os.Stderr, "Rune '%s' not found\n", string(r))
 			os.Exit(1)
 		}
 
