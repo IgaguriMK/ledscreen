@@ -82,6 +82,21 @@ func NewPixcelArray(width, height int) *PixcelArray {
 	}
 }
 
+func FilledPixcelArray(width, height int, px Pixcel) *PixcelArray {
+	pixcels := make([][]Pixcel, width)
+	for x := 0; x < width; x++ {
+		pixcels[x] = make([]Pixcel, height)
+		for y := 0; y < height; y++ {
+			pixcels[x][y] = px
+		}
+	}
+	return &PixcelArray{
+		Width:   width,
+		Height:  height,
+		Pixcels: pixcels,
+	}
+}
+
 func loadImage(fileName string, file io.Reader) (image.Image, error) {
 	switch {
 	case strings.HasSuffix(fileName, ".jpeg"):
@@ -207,6 +222,29 @@ func (pa *PixcelArray) DotImage(dot *PixcelArray) *PixcelArray {
 		}
 		npa.JoinHorizontal(line)
 	}
+
+	return npa
+}
+
+func (pa *PixcelArray) Cut(from, length int, fillcolor Pixcel) *PixcelArray {
+	var npa *PixcelArray
+
+	if from < 0 {
+		npa = FilledPixcelArray(-from, pa.Height, fillcolor)
+		from = 0
+	} else {
+		npa = NewPixcelArray(0, pa.Height)
+	}
+	npa.JoinHorizontal(pa)
+
+	rightMargin := npa.Width - (from + length)
+	if rightMargin < 0 {
+		rightPad := FilledPixcelArray(-rightMargin, pa.Height, fillcolor)
+		npa.JoinHorizontal(rightPad)
+	}
+
+	npa.Pixcels = npa.Pixcels[from : from+length]
+	npa.Width = length
 
 	return npa
 }

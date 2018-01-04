@@ -19,7 +19,7 @@ func main() {
 	var colorFile string
 	flag.StringVar(&colorFile, "c", "colors.yml", "Colormap file")
 	var width int
-	flag.IntVar(&width, "w", 256, "Image maximum width in dot")
+	flag.IntVar(&width, "w", 256, "Image maximum width in dot. 0 is no scroll")
 
 	flag.Parse()
 	args := flag.Args()
@@ -67,8 +67,24 @@ func main() {
 		}
 	}
 
-	result := printer.Image.DotImage(dot)
-	result.SaveTo(outFile + ".png")
+	img := printer.Image
+	switch {
+	case width == 0:
+		result := img.DotImage(dot)
+		result.SaveTo(outFile + ".png")
+	case img.Width <= width:
+		left := (width - img.Width) / 2
+		result := img.Cut(-left, width, colors["_"])
+		result = result.DotImage(dot)
+		result.SaveTo(outFile + ".png")
+	default:
+		for i := 0; i < img.Width+width; i++ {
+			result := img.Cut(i-width, width, colors["_"])
+			result = result.DotImage(dot)
+			cnt := fmt.Sprintf("%06d", i)
+			result.SaveTo(outFile + "/" + cnt + ".png")
+		}
+	}
 }
 
 type Printer struct {

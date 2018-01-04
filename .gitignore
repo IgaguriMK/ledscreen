@@ -6,6 +6,7 @@ genimage
 *.jpeg
 *.jpg
 *.png
+*.mp4
 
 !image/*.png
 !image/**/*.png
