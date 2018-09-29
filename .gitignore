@@ -11,5 +11,7 @@ genimage
 *.png
 *.mp4
 
+/output
+
 !image/*.png
 !image/**/*.png
